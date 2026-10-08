@@ -1,0 +1,33 @@
+name: publish
+
+on:
+  schedule:
+    # Every 10 minutes, 05:00-20:59 UTC (08:00-23:59 in Israel in summer time, 07:00-22:59 in winter).
+    # Off the round minute: GitHub delays the busy :00 runs the most.
+    - cron: "3-59/10 5-20 * * *"
+  workflow_dispatch:
+    inputs:
+      check:
+        description: "Only verify the token and list the next posts"
+        type: boolean
+        default: true
+
+# Never two runs at once; the second waits, then sees the post already on the profile.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node publish.mjs ${{ inputs.check && '--check' || '' }}
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          QUEUE_URL: ${{ secrets.QUEUE_URL }}
