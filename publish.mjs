@@ -7,7 +7,7 @@
 //   DRY_RUN=1 node publish.mjs  print what would be sent
 //
 // Env: IG_TOKEN, QUEUE_URL (https URL or local path of queue.json), IG_USER_ID (the Instagram business account id),
-//      optional IG_API_HOST, LEAD_MIN (default 12), MAX_LATE_MIN (default 180).
+//      optional IG_API_HOST, LEAD_MIN (default 12), MAX_LATE_MIN (default 1440).
 // Default is the Facebook Login path: IG_TOKEN = the Page token from setup-fb.mjs (it doesn't expire).
 // For Instagram Login set IG_API_HOST=https://graph.instagram.com/v25.0 and leave IG_USER_ID empty.
 import { readFileSync } from "node:fs";
@@ -17,7 +17,7 @@ const { IG_TOKEN, QUEUE_URL } = process.env;
 const DRY = process.env.DRY_RUN === "1";
 const CHECK = process.argv.includes("--check");
 const LEAD_MIN = Number(process.env.LEAD_MIN ?? 12);
-const MAX_LATE_MIN = Number(process.env.MAX_LATE_MIN ?? 180);
+const MAX_LATE_MIN = Number(process.env.MAX_LATE_MIN ?? 1440); // GitHub can delay or skip scheduled runs: late beats never
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
